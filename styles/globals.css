@@ -1,0 +1,64 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* {
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+  font-family: "Quicksand", sans-serif;
+  line-height: 1.66;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--color-white);
+}
+
+/* ---------fonts---------- */
+
+/* JacquesPro */
+@font-face {
+  font-family: "JacquesPro-R";
+  src: url("/assets/fonts/JacquesPro/JacquesPro-Regular.ttf");
+}
+
+@font-face {
+  font-family: "JacquesPro-M";
+  src: url("/assets/fonts/JacquesPro/JacquesPro-Medium.ttf");
+}
+
+@font-face {
+  font-family: "JacquesPro-SB";
+  src: url("/assets/fonts/JacquesPro/JacquesPro-SemiBold.ttf");
+}
+
+@font-face {
+  font-family: "JacquesPro-B";
+  src: url("/assets/fonts/JacquesPro/JacquesPro-Bold.ttf");
+}
+
+/* OldburgDisplay */
+
+@font-face {
+  font-family: "OldburgDisplay-R";
+  src: url("/assets/fonts/OldburgDisplay/OldburgDisplay-Regular.ttf");
+}
+
+@font-face {
+  font-family: "OldburgDisplay-M";
+  src: url("/assets/fonts/OldburgDisplay/OldburgDisplay-Medium.ttf");
+}
+
+@font-face {
+  font-family: "OldburgDisplay-SB";
+  src: url("/assets/fonts/OldburgDisplay/OldburgDisplay-SemiBold.ttf");
+}
+
+@font-face {
+  font-family: "OldburgDisplay-B";
+  src: url("/assets/fonts/OldburgDisplay/OldburgDisplay-Bold.ttf");
+}

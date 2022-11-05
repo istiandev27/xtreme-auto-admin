@@ -1,0 +1,60 @@
+/** @type {import('tailwindcss').Config} */
+module.exports = {
+  content: ["./src/**", "./pages/**"],
+  theme: {
+    fontSize: {
+      xs: ["12px", "18px"],
+      sm: ["14px", "20px"],
+      md: ["16px", "24px"],
+      lg: ["18px", "28px"],
+      xl: ["20px", "30px"],
+
+      h6: ["24px", "32px"],
+      h5: ["30px", "38px"],
+      h4: ["36px", "44px"],
+      h3: ["48px", "60px"],
+      h2: ["60px", "72px"],
+      h1: ["72px", "90px"],
+    },
+    fontFamily: {
+      JacquesR: ["JacquesPro-R"],
+      JacquesM: ["JacquesPro-M"],
+      JacquesSB: ["JacquesPro-SB"],
+      JacquesB: ["JacquesPro-B"],
+      OldburgDisplayR: ["OldburgDisplay-R"],
+      OldburgDisplayM: ["OldburgDisplay-M"],
+      OldburgDisplaySB: ["OldburgDisplay-SB"],
+      OldburgDisplayB: ["OldburgDisplay-B"],
+    },
+    extend: {
+      colors: {
+        black: "#1a1a1a",
+        red: {
+          50: "#ff6364",
+          100: "#ff595a",
+          200: "#ff4f50",
+          300: "#ff4546",
+          400: "#fc3b3c",
+          500: "#f23132",
+          600: "#e82728",
+          700: "#de1d1e",
+          800: "#d41314",
+          900: "#ca090a",
+        },
+        green: {
+          50: "#7cffb5",
+          100: "#72ffab",
+          200: "#68fda1",
+          300: "#5ef397",
+          400: "#54e98d",
+          500: "#4adf83",
+          600: "#40d579",
+          700: "#36cb6f",
+          800: "#2cc165",
+          900: "#22b75b",
+        },
+      },
+    },
+  },
+  plugins: [require("@tailwindcss/forms")],
+};
