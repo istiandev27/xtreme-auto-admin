@@ -17,7 +17,7 @@ import { storage } from "../../../../../firebase";
 import { Button } from "../../../elements/Buttons/Button";
 import { SectionContainer } from "../../../elements/SectionContainer";
 import { Typography } from "../../../elements/Typography";
-import CarInputs from "../../../../../interfaces/CarInputs";
+import CarInputs from "../../../../interfaces/CarInputs";
 import { AddCars } from "../AddCars";
 import useContent from "../../../../../context/useContent";
 import Cards from "../../../elements/Cards/Cards";
@@ -28,7 +28,7 @@ import { FiTrash } from "react-icons/fi";
 import { RiAddFill } from "react-icons/ri";
 
 //data for selecting brands
-import { BrandList } from "../../../../../data/BrandList";
+import { BrandList } from "../../../../data/BrandList";
 
 export const Carform = () => {
   const [imgUrl, setImgUrl] = useState<any>([]);

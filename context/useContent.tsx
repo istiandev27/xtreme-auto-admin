@@ -8,7 +8,7 @@ import {
 } from "firebase/firestore";
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
 import { db } from "../firebase";
-import CarInputs from "../interfaces/CarInputs";
+import CarInputs from "../src/interfaces/CarInputs";
 
 interface IContent {
   cars: DocumentData[] | null;
