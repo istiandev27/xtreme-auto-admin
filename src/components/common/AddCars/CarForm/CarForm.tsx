@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { useForm, SubmitHandler, useFieldArray } from "react-hook-form";
 
 import { ref, getDownloadURL, uploadBytesResumable } from "firebase/storage";
@@ -12,6 +12,8 @@ import { Typography } from "../../../elements/Typography";
 import CarInputs from "../../../../interfaces/CarInputs";
 import Image from "next/image";
 
+import useContent from "../../../../../context/useContent";
+
 //icons
 import { FiTrash } from "react-icons/fi";
 import { RiAddFill } from "react-icons/ri";
@@ -23,6 +25,8 @@ export const Carform = () => {
   const [imagesAsFiles, setImagesAsFiles] = useState<any>(null);
   const [imagesAsUrl, setImagesAsUrl] = useState<any>([]);
   const realUrls: any[] = [];
+
+  const { addCar } = useContent();
 
   console.log(imagesAsFiles);
   console.log(imagesAsUrl);
@@ -107,7 +111,7 @@ export const Carform = () => {
   const onSubmit: SubmitHandler<CarInputs> = async (CarInputs) => {
     console.log(CarInputs);
 
-    // addCar(CarInputs);
+    addCar(CarInputs);
   };
 
   return (
