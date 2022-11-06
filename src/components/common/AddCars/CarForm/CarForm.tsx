@@ -1,15 +1,7 @@
-import { useContext, useEffect, useState } from "react";
+import { useState } from "react";
 import { useForm, SubmitHandler, useFieldArray } from "react-hook-form";
-import { IoIosAddCircle, IoIosAddCircleOutline } from "react-icons/io";
 
-import {
-  ref,
-  uploadBytes,
-  getDownloadURL,
-  listAll,
-  list,
-  uploadBytesResumable,
-} from "firebase/storage";
+import { ref, getDownloadURL, uploadBytesResumable } from "firebase/storage";
 
 import { storage } from "../../../../../firebase";
 // import { v4 } from "uuid";
@@ -31,12 +23,11 @@ import { RiAddFill } from "react-icons/ri";
 import { BrandList } from "../../../../data/BrandList";
 
 export const Carform = () => {
-  const [imgUrl, setImgUrl] = useState<any>([]);
-  const [progresspercent, setProgresspercent] = useState(0);
-  console.log(imgUrl);
+  const [imagesAsFiles, setImagesAsFiles] = useState<any>(null);
+  const [imagesAsUrl, setImagesAsUrl] = useState<any>([]);
+  const realUrls = [];
 
-  // const [carDetails, setcarDetails] = useState("");
-  const { addCar } = useContent();
+  const [progresspercent, setProgresspercent] = useState(0);
 
   const { register, handleSubmit, control, watch } = useForm<CarInputs>();
 
@@ -58,32 +49,56 @@ export const Carform = () => {
     remove: securityRemove,
   } = useFieldArray({ control, name: "securities" });
 
-  const handleSubmitImage = (e: any) => {
-    e.preventDefault();
-    const file = e.target[0]?.files[0];
+  console.log(imagesAsFiles);
+  console.log(imagesAsUrl);
+  for (const url in imagesAsUrl) {
+    console.log(url);
+    if (url !== 0) {
+      realUrls.push(imagesAsUrl[url]);
+    }
+  }
+  const filesInputHandler = (event: any) => {
+    //console.log(event);
+    setImagesAsFiles(event.target.files);
+  };
 
-    if (!file) return;
+  const formSubmitHandler = (event: any) => {
+    event.preventDefault();
 
-    const storageRef = ref(storage, `files/${file.name}`);
-    const uploadTask = uploadBytesResumable(storageRef, file);
+    for (const file in imagesAsFiles) {
+      console.log(file, "type: ", typeof file);
 
-    uploadTask.on(
-      "state_changed",
-      (snapshot) => {
-        const progress = Math.round(
-          (snapshot.bytesTransferred / snapshot.totalBytes) * 100
-        );
-        setProgresspercent(progress);
-      },
-      (error) => {
-        alert(error);
-      },
-      () => {
-        getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
-          setImgUrl(downloadURL);
-        });
+      if (file.length !== 1) {
+        continue;
       }
-    );
+
+      if (!imagesAsFiles[file].name) {
+        continue;
+      }
+
+      console.log(imagesAsFiles[file]);
+
+      const storageRef = ref(storage, `/images/${imagesAsFiles[file].name}`);
+      const uploadTask = uploadBytesResumable(storageRef, imagesAsFiles[file]);
+
+      uploadTask.on(
+        "state_changed",
+        (snapshot) => {
+          const progress = Math.round(
+            (snapshot.bytesTransferred / snapshot.totalBytes) * 100
+          );
+          setProgresspercent(progress);
+        },
+        (error) => {
+          console.log(error.message);
+        },
+        () => {
+          getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
+            setImagesAsUrl((prevState: any) => [...prevState, downloadURL]);
+          });
+        }
+      );
+    }
   };
 
   const onSubmit: SubmitHandler<CarInputs> = async (CarInputs) => {
@@ -96,21 +111,33 @@ export const Carform = () => {
     <>
       <SectionContainer>
         <div className="App">
-          <form onSubmit={handleSubmitImage} className="form">
-            <input type="file" multiple />
-            <button type="submit">Upload</button>
+          <h1>Welcome</h1>
+          <form onSubmit={formSubmitHandler}>
+            <input
+              type="file"
+              multiple
+              required
+              accept="image/png, image/jpeg"
+              onChange={filesInputHandler}
+            />
+            <button type="submit">Submit</button>
           </form>
-          {!imgUrl && (
-            <div className="outerbar">
+          {!imagesAsUrl.length && (
+            <div style={{ width: "200px", height: "3px" }}>
               <div
-                className="innerbar"
-                style={{ width: `${progresspercent}%` }}
+                style={{
+                  height: "3px",
+                  backgroundColor: "green",
+                  width: `${progresspercent}%`,
+                }}
               >
                 {progresspercent}%
               </div>
             </div>
           )}
-          {imgUrl && <img src={imgUrl} alt="uploaded file" height={200} />}
+          {imagesAsUrl.map((url: any) => (
+            <Image key={url} src={url} alt="item" width={100} height={100} />
+          ))}
         </div>
         <div className="flex flex-col items-center justify-center gap-4">
           <form

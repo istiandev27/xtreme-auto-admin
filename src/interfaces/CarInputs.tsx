@@ -18,6 +18,7 @@ export default interface CarInputs {
   cylinder: number;
   interior: number;
   price: number;
+  images: { image: string }[];
   interiorDesigns: { name: string }[];
   exteriorDesigns: { name: string }[];
   securities: { name: string }[];
