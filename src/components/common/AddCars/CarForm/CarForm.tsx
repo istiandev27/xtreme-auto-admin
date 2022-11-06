@@ -10,9 +10,6 @@ import { Button } from "../../../elements/Buttons/Button";
 import { SectionContainer } from "../../../elements/SectionContainer";
 import { Typography } from "../../../elements/Typography";
 import CarInputs from "../../../../interfaces/CarInputs";
-import { AddCars } from "../AddCars";
-import useContent from "../../../../../context/useContent";
-import Cards from "../../../elements/Cards/Cards";
 import Image from "next/image";
 
 //icons
@@ -25,7 +22,7 @@ import { BrandList } from "../../../../data/BrandList";
 export const Carform = () => {
   const [imagesAsFiles, setImagesAsFiles] = useState<any>(null);
   const [imagesAsUrl, setImagesAsUrl] = useState<any>([]);
-  const realUrls = [];
+  const realUrls: any[] = [];
 
   const [progresspercent, setProgresspercent] = useState(0);
 
@@ -51,18 +48,20 @@ export const Carform = () => {
 
   console.log(imagesAsFiles);
   console.log(imagesAsUrl);
-  for (const url in imagesAsUrl) {
-    console.log(url);
-    if (url !== 0) {
-      realUrls.push(imagesAsUrl[url]);
-    }
-  }
+
+  // for (const url in imagesAsUrl) {
+  //   console.log(url);
+  //    if (url !== 0) {
+  //         realUrls.push(imagesAsUrl[url]);
+  //       }
+  // }
+
   const filesInputHandler = (event: any) => {
     //console.log(event);
     setImagesAsFiles(event.target.files);
   };
 
-  const formSubmitHandler = (event: any) => {
+  const formSubmitHandler: SubmitHandler<CarInputs> = async (event: any) => {
     event.preventDefault();
 
     for (const file in imagesAsFiles) {
@@ -112,7 +111,7 @@ export const Carform = () => {
       <SectionContainer>
         <div className="App">
           <h1>Welcome</h1>
-          <form onSubmit={formSubmitHandler}>
+          <form onSubmit={handleSubmit(formSubmitHandler)}>
             <input
               type="file"
               multiple
