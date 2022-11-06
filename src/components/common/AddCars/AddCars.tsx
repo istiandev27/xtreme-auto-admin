@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import { Typography } from "../../elements/Typography";
 import { SectionContainer } from "../../elements/SectionContainer";
 import { Carform } from "./CarForm";
-import { CarsDetails } from "../CarsDetails/CarsDetails";
 
 export const AddCars = () => {
   const [formData, setFormData] = useState("");
