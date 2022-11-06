@@ -24,9 +24,13 @@ export const Carform = () => {
   const [imagesAsUrl, setImagesAsUrl] = useState<any>([]);
   const realUrls: any[] = [];
 
+  console.log(imagesAsFiles);
+  console.log(imagesAsUrl);
+
   const [progresspercent, setProgresspercent] = useState(0);
 
-  const { register, handleSubmit, control, watch } = useForm<CarInputs>();
+  const { register, handleSubmit, control, watch, setValue } =
+    useForm<CarInputs>();
 
   const {
     fields: interiorFields,
@@ -46,22 +50,19 @@ export const Carform = () => {
     remove: securityRemove,
   } = useFieldArray({ control, name: "securities" });
 
-  console.log(imagesAsFiles);
-  console.log(imagesAsUrl);
-
-  // for (const url in imagesAsUrl) {
-  //   console.log(url);
-  //    if (url !== 0) {
-  //         realUrls.push(imagesAsUrl[url]);
-  //       }
-  // }
+  for (const url in imagesAsUrl) {
+    console.log(url);
+    if (url.length !== 0) {
+      realUrls.push(imagesAsUrl[url]);
+    }
+  }
 
   const filesInputHandler = (event: any) => {
     //console.log(event);
     setImagesAsFiles(event.target.files);
   };
 
-  const formSubmitHandler: SubmitHandler<CarInputs> = async (event: any) => {
+  const formSubmitHandler = async (event: any) => {
     event.preventDefault();
 
     for (const file in imagesAsFiles) {
@@ -100,6 +101,9 @@ export const Carform = () => {
     }
   };
 
+  console.log(imagesAsUrl);
+  setValue("images", imagesAsUrl);
+
   const onSubmit: SubmitHandler<CarInputs> = async (CarInputs) => {
     console.log(CarInputs);
 
@@ -111,7 +115,7 @@ export const Carform = () => {
       <SectionContainer>
         <div className="App">
           <h1>Welcome</h1>
-          <form onSubmit={handleSubmit(formSubmitHandler)}>
+          <form onSubmit={formSubmitHandler}>
             <input
               type="file"
               multiple
