@@ -1,9 +1,8 @@
 import { Fragment, useState } from "react";
 import { Listbox, Transition } from "@headlessui/react";
-import { CheckIcon, SelectorIcon } from "@heroicons/react/solid";
 import Image from "next/image";
-
-import { useController, UseControllerProps } from "react-hook-form";
+import { BsCheck } from "react-icons/bs";
+import { HiOutlineSelector } from "react-icons/hi";
 
 function classNames(...classes: string[]) {
   return classes.filter(Boolean).join(" ");
@@ -32,7 +31,7 @@ const CustomWithIcon = ({ label, items }: any) => {
                 <span className="ml-3 block truncate">{selected.name}</span>
               </span>
               <span className="pointer-events-none absolute inset-y-0 right-0 ml-3 flex items-center pr-2">
-                <SelectorIcon
+                <HiOutlineSelector
                   className="h-5 w-5 text-gray-400"
                   aria-hidden="true"
                 />
@@ -85,7 +84,7 @@ const CustomWithIcon = ({ label, items }: any) => {
                               "absolute inset-y-0 right-0 flex items-center pr-4"
                             )}
                           >
-                            <CheckIcon className="h-5 w-5" aria-hidden="true" />
+                            <BsCheck className="h-5 w-5" aria-hidden="true" />
                           </span>
                         ) : null}
                       </>
