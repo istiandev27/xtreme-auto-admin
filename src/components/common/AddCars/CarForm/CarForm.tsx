@@ -139,7 +139,7 @@ export const Carform = () => {
   return (
     <>
       {/* image Cover */}
-      <SectionContainer className="flex flex-col gap-5">
+      <SectionContainer className="flex flex-col gap-4">
         <div className="flex w-full flex-col gap-4">
           <form onSubmit={uploadFile}>
             <Typography variant="lg" className="font-JacquesM">
@@ -236,7 +236,7 @@ export const Carform = () => {
           </div>
         </div>
 
-        <div className="mt-4 flex flex-col items-center justify-center gap-4">
+        <div className=" flex flex-col items-center justify-center gap-4">
           <form
             onSubmit={handleSubmit(onSubmit)}
             className="flex w-full flex-wrap justify-between gap-4"
@@ -246,16 +246,11 @@ export const Carform = () => {
               <Typography variant="lg" className="font-JacquesM">
                 Make
               </Typography>
-              <select
+              <input
+                type="text"
                 {...register("make")}
                 className="block w-full rounded-lg border border-gray-300 py-2 px-4  font-JacquesM text-xs text-black focus:border-gray-400 focus:ring-gray-100 md:text-sm lg:text-md"
-              >
-                {BrandList.map((item: any) => (
-                  <option key={item.id} value={item.name} className="my-4">
-                    {item.name}
-                  </option>
-                ))}
-              </select>
+              ></input>
             </div>
             {/* description */}
             <div className="flex w-full flex-col">
