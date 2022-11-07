@@ -1,4 +1,4 @@
-import { useContext, useState } from "react";
+import { useState } from "react";
 import { useForm, SubmitHandler, useFieldArray } from "react-hook-form";
 
 import { ref, getDownloadURL, uploadBytesResumable } from "firebase/storage";
@@ -22,20 +22,22 @@ import { RiAddFill } from "react-icons/ri";
 import { BrandList } from "../../../../data/BrandList";
 
 export const Carform = () => {
-  const [imagesAsFiles, setImagesAsFiles] = useState<any>(null);
-  const [imagesAsUrl, setImagesAsUrl] = useState<any>([]);
+  //cover image
+  const [imageCoverUrl, setImageCoverUrl] = useState<any>(null);
+  const [imageCoverProgresspercent, setImageCoverProgresspercent] = useState(0);
+
+  //image array
+  const [imagesFiles, setImagesFiles] = useState<any>(null);
+  const [imagesUrl, setImagesUrl] = useState<any>([]);
+  const [imagesProgresspercent, setImagesProgresspercent] = useState(0);
   const realUrls: any[] = [];
+  const { addCar, deleteFile } = useContent();
 
-  const { addCar } = useContent();
-
-  console.log(imagesAsFiles);
-  console.log(imagesAsUrl);
-
-  const [progresspercent, setProgresspercent] = useState(0);
-
+  //react hook form
   const { register, handleSubmit, control, watch, setValue } =
     useForm<CarInputs>();
 
+  //for field array
   const {
     fields: interiorFields,
     append: interiorAppend,
@@ -54,115 +56,191 @@ export const Carform = () => {
     remove: securityRemove,
   } = useFieldArray({ control, name: "securities" });
 
-  for (const url in imagesAsUrl) {
-    console.log(url);
+  //  file upload
+  const uploadFile = (event: any) => {
+    event.preventDefault();
+
+    const file = event.target[0]?.files[0];
+    console.log(event.target[0]?.files[0].type);
+    if (!file) return;
+    const storageRef = ref(storage, `Cars/${file.name}`);
+
+    const uploadTask = uploadBytesResumable(storageRef, file);
+
+    uploadTask.on(
+      "state_changed",
+      (snapshot) => {
+        const progress = Math.round(
+          (snapshot.bytesTransferred / snapshot.totalBytes) * 100
+        );
+        setImageCoverProgresspercent(progress);
+      },
+      (error) => {
+        alert(error);
+      },
+      () => {
+        getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
+          setImageCoverUrl(downloadURL);
+        });
+      }
+    );
+  };
+  setValue("imageCover", imageCoverUrl);
+
+  // for multiple file upload
+  for (const url in imagesUrl) {
     if (url.length !== 0) {
-      realUrls.push(imagesAsUrl[url]);
+      realUrls.push(imagesUrl[url]);
     }
   }
-
   const filesInputHandler = (event: any) => {
     //console.log(event);
-    setImagesAsFiles(event.target.files);
+    setImagesFiles(event.target.files);
   };
 
   const formSubmitHandler = async (event: any) => {
     event.preventDefault();
-
-    for (const file in imagesAsFiles) {
-      console.log(file, "type: ", typeof file);
-
+    for (const file in imagesFiles) {
       if (file.length !== 1) {
         continue;
       }
-
-      if (!imagesAsFiles[file].name) {
+      if (!imagesFiles[file].name) {
         continue;
       }
-
-      console.log(imagesAsFiles[file]);
-
-      const storageRef = ref(storage, `/images/${imagesAsFiles[file].name}`);
-      const uploadTask = uploadBytesResumable(storageRef, imagesAsFiles[file]);
-
+      const storageRef = ref(storage, `/Cars/${imagesFiles[file].name}`);
+      const uploadTask = uploadBytesResumable(storageRef, imagesFiles[file]);
       uploadTask.on(
         "state_changed",
         (snapshot) => {
           const progress = Math.round(
             (snapshot.bytesTransferred / snapshot.totalBytes) * 100
           );
-          setProgresspercent(progress);
+          setImagesProgresspercent(progress);
         },
         (error) => {
           console.log(error.message);
         },
         () => {
           getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
-            setImagesAsUrl((prevState: any) => [...prevState, downloadURL]);
+            setImagesUrl((prevState: any) => [...prevState, downloadURL]);
           });
         }
       );
     }
   };
+  setValue("images", imagesUrl);
 
-  console.log(imagesAsUrl);
-  setValue("images", imagesAsUrl);
-
+  //submit all data
   const onSubmit: SubmitHandler<CarInputs> = async (CarInputs) => {
     console.log(CarInputs);
-
     addCar(CarInputs);
   };
 
   return (
     <>
-      <SectionContainer>
-        <div className="App">
-          <h1>Welcome</h1>
-          <form onSubmit={formSubmitHandler}>
+      {/* image Cover */}
+      <SectionContainer className="flex flex-col gap-5">
+        <div className="flex w-full flex-col gap-4">
+          <form onSubmit={uploadFile}>
+            <Typography variant="lg" className="font-JacquesM">
+              Cover Image
+            </Typography>
             <input
               type="file"
-              multiple
-              required
-              accept="image/png, image/jpeg"
-              onChange={filesInputHandler}
+              className="block border font-JacquesM text-xs text-black focus:border-gray-400 focus:ring-gray-100 md:text-sm lg:text-md"
             />
-            <button type="submit">Submit</button>
+            <Button type="submit" variant="tertiary" className="mt-1">
+              Upload
+            </Button>
           </form>
-          {!imagesAsUrl.length && (
-            <div style={{ width: "200px", height: "3px" }}>
+          {/* progesspercent */}
+          {!imageCoverUrl && (
+            <div className=" flex h-1 w-full flex-col">
               <div
+                className="h-1 bg-red-500"
                 style={{
-                  height: "3px",
-                  backgroundColor: "green",
-                  width: `${progresspercent}%`,
+                  width: `${imageCoverProgresspercent}%`,
                 }}
-              >
-                {progresspercent}%
-              </div>
+              ></div>
             </div>
           )}
-          {imagesAsUrl.map((url: any) => (
-            <Image key={url} src={url} alt="item" width={100} height={100} />
-          ))}
+          {imageCoverUrl && (
+            <div className="relative flex ">
+              <Image
+                src={imageCoverUrl}
+                width={200}
+                height={200}
+                alt="carImages"
+                className=" rounded-lg shadow-lg"
+              />
+              <Button
+                variant="tertiary"
+                IconOnly={<FiTrash />}
+                onClick={() => deleteFile(imageCoverUrl)}
+                className="absolute top-0 right-0 z-10"
+              ></Button>
+            </div>
+          )}
         </div>
-        <div className="flex flex-col items-center justify-center gap-4">
+
+        {/* images */}
+        <div className="flex flex-col gap-4">
+          <form onSubmit={formSubmitHandler}>
+            <div className="flex flex-col">
+              <Typography variant="lg" className="font-JacquesM">
+                Multiple Images
+              </Typography>
+              <input
+                type="file"
+                multiple
+                required
+                onChange={filesInputHandler}
+                accept="image/png, image/jpeg"
+                className="block border font-JacquesM text-xs text-black focus:border-gray-400 focus:ring-gray-100 md:text-sm lg:text-md"
+              />
+            </div>
+            <Button type="submit" variant="tertiary" className="mt-1">
+              Upload
+            </Button>
+          </form>
+          {/* progesspercent */}
+          {!imagesUrl.length && (
+            <div className=" flex h-1 w-full flex-col">
+              <div
+                className="h-1 bg-red-500"
+                style={{
+                  width: `${imagesProgresspercent}%`,
+                }}
+              ></div>
+            </div>
+          )}
+          {/* display images */}
+          <div className="flex flex-wrap gap-4">
+            {imagesUrl.map((url: any) => (
+              <div key={url} className="relative flex  ">
+                <Image
+                  src={url}
+                  width={200}
+                  height={200}
+                  alt="carImages"
+                  className=" rounded-lg shadow-lg"
+                />
+                <Button
+                  variant="tertiary"
+                  IconOnly={<FiTrash />}
+                  onClick={() => deleteFile(url)}
+                  className="absolute top-0 right-0 z-10"
+                ></Button>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="mt-4 flex flex-col items-center justify-center gap-4">
           <form
             onSubmit={handleSubmit(onSubmit)}
             className="flex w-full flex-wrap justify-between gap-4"
           >
-            {/* title */}
-            <div className="flex w-full flex-col">
-              <Typography variant="lg" className="font-JacquesM">
-                Title
-              </Typography>
-              <input
-                type="text"
-                placeholder=""
-                {...register("title")}
-                className="block w-full rounded-lg border border-gray-300 py-2 px-4  font-JacquesM text-xs text-black focus:border-gray-400 focus:ring-gray-100 md:text-sm lg:text-md"
-              />
-            </div>
             {/* make */}
             <div className="flex w-full flex-col">
               <Typography variant="lg" className="font-JacquesM">
@@ -186,8 +264,10 @@ export const Carform = () => {
               </Typography>
               <textarea
                 {...register("description")}
-                className="block w-full rounded-lg border border-gray-300 py-2 px-4  font-JacquesM text-xs text-black focus:border-gray-400 focus:ring-gray-100 md:text-sm lg:text-md"
-              ></textarea>
+                className="block h-36 w-full rounded-lg border border-gray-300 py-2 px-4 font-JacquesM text-xs text-black focus:border-gray-400 focus:ring-gray-100 md:text-sm lg:text-md"
+              >
+                asdasd
+              </textarea>
             </div>
             {/* year */}
             <div className="flex w-full flex-col xl:w-[48%]">

@@ -1,20 +1,16 @@
 import { useRouter } from "next/router";
-import {
-  getFirestore,
-  collection,
-  addDoc,
-  getDocs,
-  DocumentData,
-} from "firebase/firestore";
+import { collection, addDoc, getDocs, DocumentData } from "firebase/firestore";
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
-import { db } from "../firebase";
+import { db, storage } from "../firebase";
 import CarInputs from "../src/interfaces/CarInputs";
+import { deleteObject, ref } from "firebase/storage";
 
 interface IContent {
   cars: DocumentData[] | null;
   addCar: (CarInputs: CarInputs) => Promise<void>;
   editCar: () => Promise<void>;
   deletecar: () => Promise<void>;
+  deleteFile: (file: any) => Promise<void>;
   error: string | null;
   loading: boolean;
 }
@@ -24,6 +20,7 @@ const ContentContext = createContext<IContent>({
   addCar: async () => {},
   editCar: async () => {},
   deletecar: async () => {},
+  deleteFile: async () => {},
   error: null,
   loading: false,
 });
@@ -73,8 +70,24 @@ export const ContentProvider = ({ children }: ContentProviderProps) => {
     setLoading(true);
   };
 
+  // delete image
+  const deleteFile = async (file: any) => {
+    //1.
+    const pictureRef = ref(storage, file);
+    //2.
+    deleteObject(pictureRef)
+      .then(() => {
+        // File deleted successfully
+        console.log("File deleted successfully");
+      })
+      .catch((error) => {
+        // Uh-oh, an error occurred!
+        console.log(error.message);
+      });
+  };
+
   const memoedValue = useMemo(
-    () => ({ cars, addCar, editCar, deletecar, error, loading }),
+    () => ({ cars, addCar, editCar, deletecar, deleteFile, error, loading }),
     [loading, error]
   );
 

@@ -1,5 +1,4 @@
 export default interface CarInputs {
-  title: string;
   make: string;
   year: number;
   description: string;
@@ -18,6 +17,7 @@ export default interface CarInputs {
   cylinder: number;
   interior: number;
   price: number;
+  imageCover: string;
   images: [];
   interiorDesigns: { name: string }[];
   exteriorDesigns: { name: string }[];

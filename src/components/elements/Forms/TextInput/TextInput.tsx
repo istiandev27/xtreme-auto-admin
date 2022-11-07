@@ -6,7 +6,6 @@ import { Typography } from "../../Typography";
 
 export interface TextInputProps {
   type: "text" | "email";
-  value: string;
   handleChange: (value: string) => void;
   label?: string;
   leadingText?: string;
@@ -21,7 +20,6 @@ export interface TextInputProps {
 
 export const TextInput: FC<TextInputProps> = ({
   type,
-  value,
   handleChange,
   label,
   leadingText,
@@ -70,7 +68,7 @@ export const TextInput: FC<TextInputProps> = ({
         {leadingText ? (
           <div
             className={classNames(
-              "font-manjari text-md flex h-11 items-center rounded-l-lg border border-r-0 border-gray-300 pt-1.5 pl-3.5 pr-3 text-gray-500 dark:border-gray-500",
+              "font-manjari flex h-11 items-center rounded-l-lg border border-r-0 border-gray-300 pt-1.5 pl-3.5 pr-3 text-md text-gray-500 dark:border-gray-500",
               {
                 "bg-gray-50 dark:bg-gray-700": disabled,
                 "dark:bg-gray-800": !disabled,
@@ -83,7 +81,6 @@ export const TextInput: FC<TextInputProps> = ({
 
         <input
           type={type}
-          value={value}
           onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
             if (!disabled) {
               handleChange(event.target.value);
@@ -92,7 +89,7 @@ export const TextInput: FC<TextInputProps> = ({
           placeholder={placeholder}
           aria-label="input"
           className={classNames(
-            "font-manjari text-md flex h-11 w-full select-none items-center border pt-3 text-gray-900 dark:text-white",
+            "font-manjari flex h-11 w-full select-none items-center border pt-3 text-md text-gray-900 dark:text-white",
             {
               "pl-9": LeadingIcon,
               "pr-9": TrailingIcon,
