@@ -1,9 +1,10 @@
-import { useRouter } from "next/router";
+import Router, { useRouter } from "next/router";
 import { collection, addDoc, getDocs, DocumentData } from "firebase/firestore";
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
 import { db, storage } from "../firebase";
 import CarInputs from "../src/interfaces/CarInputs";
 import { deleteObject, ref } from "firebase/storage";
+import router from "next/router";
 
 interface IContent {
   cars: DocumentData[] | null;
@@ -56,6 +57,7 @@ export const ContentProvider = ({ children }: ContentProviderProps) => {
     await addDoc(dbRef, CarInputs)
       .then(() => {
         console.log("Document has been added successfully");
+        router.push("/cars");
         setLoading(false);
       })
       .catch((error) => alert(error.message))

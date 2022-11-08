@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useForm, SubmitHandler, useFieldArray } from "react-hook-form";
+import { ErrorMessage } from "@hookform/error-message";
 
 import { ref, getDownloadURL, uploadBytesResumable } from "firebase/storage";
 
@@ -34,8 +35,14 @@ export const Carform = () => {
   const { addCar, deleteFile } = useContent();
 
   //react hook form
-  const { register, handleSubmit, control, watch, setValue } =
-    useForm<CarInputs>();
+  const {
+    register,
+    handleSubmit,
+    control,
+    watch,
+    formState: { errors },
+    setValue,
+  } = useForm<CarInputs>();
 
   //for field array
   const {
@@ -248,9 +255,15 @@ export const Carform = () => {
               </Typography>
               <input
                 type="text"
-                {...register("make")}
+                {...register("make", { required: true })}
                 className="block w-full rounded-lg border border-gray-300 py-2 px-4  font-JacquesM text-xs text-black focus:border-gray-400 focus:ring-gray-100 md:text-sm lg:text-md"
-              ></input>
+              />
+              <ErrorMessage errors={errors} name="make" />
+              <ErrorMessage
+                errors={errors}
+                name="make"
+                render={({ message }) => <p>{message}</p>}
+              />
             </div>
             {/* description */}
             <div className="flex w-full flex-col">
@@ -258,11 +271,9 @@ export const Carform = () => {
                 Description
               </Typography>
               <textarea
-                {...register("description")}
+                {...register("description", { required: "This is required." })}
                 className="block h-36 w-full rounded-lg border border-gray-300 py-2 px-4 font-JacquesM text-xs text-black focus:border-gray-400 focus:ring-gray-100 md:text-sm lg:text-md"
-              >
-                asdasd
-              </textarea>
+              />
             </div>
             {/* year */}
             <div className="flex w-full flex-col xl:w-[48%]">
@@ -271,9 +282,9 @@ export const Carform = () => {
               </Typography>
               <input
                 type="number"
-                {...register("year")}
+                {...register("year", { required: true })}
                 className="block w-full rounded-lg border border-gray-300 py-2 px-4  font-JacquesM text-xs text-black focus:border-gray-400 focus:ring-gray-100 md:text-sm lg:text-md"
-              ></input>
+              />
             </div>
 
             {/* finance */}
@@ -283,9 +294,9 @@ export const Carform = () => {
               </Typography>
               <input
                 type="text"
-                {...register("finance")}
+                {...register("finance", { required: true })}
                 className="block w-full rounded-lg border border-gray-300 py-2 px-4  font-JacquesM text-xs text-black focus:border-gray-400 focus:ring-gray-100 md:text-sm lg:text-md"
-              ></input>
+              />
             </div>
             {/* warranty */}
             <div className="flex  w-full flex-col xl:w-[48%]">
@@ -294,9 +305,9 @@ export const Carform = () => {
               </Typography>
               <input
                 type="text"
-                {...register("warranty")}
+                {...register("warranty", { required: true })}
                 className="block w-full rounded-lg border border-gray-300 py-2 px-4  font-JacquesM text-xs text-black focus:border-gray-400 focus:ring-gray-100 md:text-sm lg:text-md"
-              ></input>
+              />
             </div>
             {/* model */}
             <div className="flex  w-full flex-col xl:w-[48%]">
@@ -305,9 +316,9 @@ export const Carform = () => {
               </Typography>
               <input
                 type="text"
-                {...register("model")}
+                {...register("model", { required: true })}
                 className="block w-full rounded-lg border border-gray-300 py-2 px-4  font-JacquesM text-xs text-black focus:border-gray-400 focus:ring-gray-100 md:text-sm lg:text-md"
-              ></input>
+              />
             </div>
             {/* wheels */}
             <div className="flex  w-full flex-col xl:w-[48%]">
@@ -316,9 +327,9 @@ export const Carform = () => {
               </Typography>
               <input
                 type="text"
-                {...register("wheels")}
+                {...register("wheels", { required: true })}
                 className="block w-full rounded-lg border border-gray-300 py-2 px-4  font-JacquesM text-xs text-black focus:border-gray-400 focus:ring-gray-100 md:text-sm lg:text-md"
-              ></input>
+              />
             </div>
             {/* color */}
             <div className="flex w-full flex-col xl:w-[48%]">
@@ -327,9 +338,9 @@ export const Carform = () => {
               </Typography>
               <input
                 type="text"
-                {...register("color")}
+                {...register("color", { required: true })}
                 className="block w-full rounded-lg border border-gray-300 py-2 px-4  font-JacquesM text-xs text-black focus:border-gray-400 focus:ring-gray-100 md:text-sm lg:text-md"
-              ></input>
+              />
             </div>
             {/* vehicleType */}
             <div className="flex  w-full flex-col xl:w-[48%]">
@@ -338,9 +349,9 @@ export const Carform = () => {
               </Typography>
               <input
                 type="text"
-                {...register("vehicleType")}
+                {...register("vehicleType", { required: true })}
                 className="block w-full rounded-lg border border-gray-300 py-2 px-4  font-JacquesM text-xs text-black focus:border-gray-400 focus:ring-gray-100 md:text-sm lg:text-md"
-              ></input>
+              />
             </div>
             {/* kilometers */}
             <div className="flex  w-full flex-col xl:w-[48%]">
@@ -349,9 +360,9 @@ export const Carform = () => {
               </Typography>
               <input
                 type="text"
-                {...register("kilometers")}
+                {...register("kilometers", { required: true })}
                 className="block w-full rounded-lg border border-gray-300 py-2 px-4  font-JacquesM text-xs text-black focus:border-gray-400 focus:ring-gray-100 md:text-sm lg:text-md"
-              ></input>
+              />
             </div>
             {/* exportStatus */}
             <div className="flex  w-full flex-col xl:w-[48%]">
@@ -360,9 +371,9 @@ export const Carform = () => {
               </Typography>
               <input
                 type="text"
-                {...register("exportStatus")}
+                {...register("exportStatus", { required: true })}
                 className="block w-full rounded-lg border border-gray-300 py-2 px-4  font-JacquesM text-xs text-black focus:border-gray-400 focus:ring-gray-100 md:text-sm lg:text-md"
-              ></input>
+              />
             </div>
             {/* specs */}
             <div className="flex  w-full flex-col xl:w-[48%]">
@@ -371,9 +382,9 @@ export const Carform = () => {
               </Typography>
               <input
                 type="text"
-                {...register("specs")}
+                {...register("specs", { required: true })}
                 className="block w-full rounded-lg border border-gray-300 py-2 px-4  font-JacquesM text-xs text-black focus:border-gray-400 focus:ring-gray-100 md:text-sm lg:text-md"
-              ></input>
+              />
             </div>
             {/* gearBox */}
             <div className="flex  w-full flex-col xl:w-[48%]">
@@ -382,9 +393,9 @@ export const Carform = () => {
               </Typography>
               <input
                 type="text"
-                {...register("gearBox")}
+                {...register("gearBox", { required: true })}
                 className="block w-full rounded-lg border border-gray-300 py-2 px-4  font-JacquesM text-xs text-black focus:border-gray-400 focus:ring-gray-100 md:text-sm lg:text-md"
-              ></input>
+              />
             </div>
             {/* fuel */}
             <div className="flex  w-full flex-col xl:w-[48%]">
@@ -393,9 +404,9 @@ export const Carform = () => {
               </Typography>
               <input
                 type="text"
-                {...register("fuel")}
+                {...register("fuel", { required: true })}
                 className="block w-full rounded-lg border border-gray-300 py-2 px-4  font-JacquesM text-xs text-black focus:border-gray-400 focus:ring-gray-100 md:text-sm lg:text-md"
-              ></input>
+              />
             </div>
             {/* seat */}
             <div className="flex w-full flex-col xl:w-[48%]">
@@ -404,9 +415,9 @@ export const Carform = () => {
               </Typography>
               <input
                 type="number"
-                {...register("seat")}
+                {...register("seat", { required: true })}
                 className="block w-full rounded-lg border border-gray-300 py-2 px-4  font-JacquesM text-xs text-black focus:border-gray-400 focus:ring-gray-100 md:text-sm lg:text-md"
-              ></input>
+              />
             </div>
             {/* cylinder */}
             <div className="flex  w-full flex-col xl:w-[48%]">
@@ -415,9 +426,9 @@ export const Carform = () => {
               </Typography>
               <input
                 type="number"
-                {...register("cylinder")}
+                {...register("cylinder", { required: true })}
                 className="block w-full rounded-lg border border-gray-300 py-2 px-4  font-JacquesM text-xs text-black focus:border-gray-400 focus:ring-gray-100 md:text-sm lg:text-md"
-              ></input>
+              />
             </div>
             {/* interior */}
             <div className="flex w-full flex-col xl:w-[48%]">
@@ -426,9 +437,9 @@ export const Carform = () => {
               </Typography>
               <input
                 type="text"
-                {...register("interior")}
+                {...register("interior", { required: true })}
                 className="block w-full rounded-lg border border-gray-300 py-2 px-4  font-JacquesM text-xs text-black focus:border-gray-400 focus:ring-gray-100 md:text-sm lg:text-md"
-              ></input>
+              />
             </div>
             {/* price */}
             <div className="flex w-full flex-col xl:w-[48%]">
@@ -437,9 +448,9 @@ export const Carform = () => {
               </Typography>
               <input
                 type="number"
-                {...register("price")}
+                {...register("price", { required: true })}
                 className="block w-full rounded-lg border border-gray-300 py-2 px-4  font-JacquesM text-xs text-black focus:border-gray-400 focus:ring-gray-100 md:text-sm lg:text-md"
-              ></input>
+              />
             </div>
             {/* interiorDesign */}
             <div className="flex  w-full flex-col gap-4">
