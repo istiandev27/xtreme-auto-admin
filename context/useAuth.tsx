@@ -64,7 +64,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     await createUserWithEmailAndPassword(auth, email, password)
       .then((userCredential) => {
         setUser(userCredential.user);
-        router.push("/admin");
+        router.push("/");
         setLoading(false);
       })
       .catch((error) => alert(error.message))
@@ -76,7 +76,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     await signInWithEmailAndPassword(auth, email, password)
       .then((userCredential) => {
         setUser(userCredential.user);
-        router.push("/admin/dashboard");
+        router.push("/");
         setLoading(false);
       })
       .catch((error) => alert(error.message))

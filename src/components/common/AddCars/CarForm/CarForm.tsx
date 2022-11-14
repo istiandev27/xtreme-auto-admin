@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm, SubmitHandler, useFieldArray } from "react-hook-form";
 import { ErrorMessage } from "@hookform/error-message";
 
@@ -13,7 +13,7 @@ import { Typography } from "../../../elements/Typography";
 import CarInputs from "../../../../interfaces/CarInputs";
 import Image from "next/image";
 
-import useContent from "../../../../../context/useContent";
+import { useHookCars } from "../../../../../hook/cars";
 
 //icons
 import { FiTrash } from "react-icons/fi";
@@ -24,15 +24,23 @@ import { BrandList } from "../../../../data/BrandList";
 
 export const Carform = () => {
   //cover image
-  const [imageCoverUrl, setImageCoverUrl] = useState<any>(null);
-  const [imageCoverProgresspercent, setImageCoverProgresspercent] = useState(0);
 
   //image array
   const [imagesFiles, setImagesFiles] = useState<any>(null);
   const [imagesUrl, setImagesUrl] = useState<any>([]);
   const [imagesProgresspercent, setImagesProgresspercent] = useState(0);
   const realUrls: any[] = [];
-  const { addCar, deleteFile } = useContent();
+
+  const {
+    addCar,
+    deleteFile,
+    loading,
+    //single file upload
+    uploadFile,
+    imageCoverUrl,
+    setImageCoverUrl,
+    imageCoverProgresspercent,
+  } = useHookCars();
 
   //react hook form
   const {
@@ -62,37 +70,6 @@ export const Carform = () => {
     append: securityAppend,
     remove: securityRemove,
   } = useFieldArray({ control, name: "securities" });
-
-  //  file upload
-  const uploadFile = (event: any) => {
-    event.preventDefault();
-
-    const file = event.target[0]?.files[0];
-    console.log(event.target[0]?.files[0].type);
-    if (!file) return;
-    const storageRef = ref(storage, `Cars/${file.name}`);
-
-    const uploadTask = uploadBytesResumable(storageRef, file);
-
-    uploadTask.on(
-      "state_changed",
-      (snapshot) => {
-        const progress = Math.round(
-          (snapshot.bytesTransferred / snapshot.totalBytes) * 100
-        );
-        setImageCoverProgresspercent(progress);
-      },
-      (error) => {
-        alert(error);
-      },
-      () => {
-        getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
-          setImageCoverUrl(downloadURL);
-        });
-      }
-    );
-  };
-  setValue("imageCover", imageCoverUrl);
 
   // for multiple file upload
   for (const url in imagesUrl) {
@@ -136,6 +113,24 @@ export const Carform = () => {
     }
   };
   setValue("images", imagesUrl);
+  setValue("imageCover", imageCoverUrl);
+
+  //delete single file
+  const handleDeletefile = (file: any) => {
+    deleteFile(file);
+    setImageCoverUrl(null);
+  };
+
+  //delete files
+  const handleDeletefiles = (file: any) => {
+    deleteFile(file);
+    const index = imagesUrl.indexOf(file); // find a index of the file
+    if (index !== -1) {
+      imagesUrl.splice(index, 1); // splice or remove from index located
+    }
+    const newImage = [...imagesUrl];
+    setImagesUrl(newImage);
+  };
 
   //submit all data
   const onSubmit: SubmitHandler<CarInputs> = async (CarInputs) => {
@@ -171,6 +166,7 @@ export const Carform = () => {
               ></div>
             </div>
           )}
+
           {imageCoverUrl && (
             <div className="relative flex ">
               <Image
@@ -183,7 +179,7 @@ export const Carform = () => {
               <Button
                 variant="tertiary"
                 IconOnly={<FiTrash />}
-                onClick={() => deleteFile(imageCoverUrl)}
+                onClick={() => handleDeletefile(imageCoverUrl)}
                 className="absolute top-0 right-0 z-10"
               ></Button>
             </div>
@@ -235,7 +231,7 @@ export const Carform = () => {
                 <Button
                   variant="tertiary"
                   IconOnly={<FiTrash />}
-                  onClick={() => deleteFile(url)}
+                  onClick={() => handleDeletefiles(url)}
                   className="absolute top-0 right-0 z-10"
                 ></Button>
               </div>
@@ -248,6 +244,22 @@ export const Carform = () => {
             onSubmit={handleSubmit(onSubmit)}
             className="flex w-full flex-wrap justify-between gap-4"
           >
+            <div className="flex w-full">
+              {/* onSale */}
+              <div className="flex w-[50%] items-center gap-5">
+                <input type="checkbox" {...register("onSale")} />
+                <Typography variant="lg" className="font-JacquesM">
+                  on Sale ?
+                </Typography>
+              </div>
+              {/* onFeatured */}
+              <div className="flex w-[50%]  items-center gap-5">
+                <input type="checkbox" {...register("onFeatured")} />
+                <Typography variant="lg" className="font-JacquesM">
+                  on Featured ?
+                </Typography>
+              </div>
+            </div>
             {/* make */}
             <div className="flex w-full flex-col">
               <Typography variant="lg" className="font-JacquesM">
@@ -255,14 +267,17 @@ export const Carform = () => {
               </Typography>
               <input
                 type="text"
-                {...register("make", { required: true })}
+                {...register("make", { required: "This is required." })}
                 className="block w-full rounded-lg border border-gray-300 py-2 px-4  font-JacquesM text-xs text-black focus:border-gray-400 focus:ring-gray-100 md:text-sm lg:text-md"
               />
-              <ErrorMessage errors={errors} name="make" />
               <ErrorMessage
                 errors={errors}
                 name="make"
-                render={({ message }) => <p>{message}</p>}
+                render={({ message }) => (
+                  <Typography variant="sm" customColor="text-red-500">
+                    {message}
+                  </Typography>
+                )}
               />
             </div>
             {/* description */}
@@ -274,6 +289,15 @@ export const Carform = () => {
                 {...register("description", { required: "This is required." })}
                 className="block h-36 w-full rounded-lg border border-gray-300 py-2 px-4 font-JacquesM text-xs text-black focus:border-gray-400 focus:ring-gray-100 md:text-sm lg:text-md"
               />
+              <ErrorMessage
+                errors={errors}
+                name="description"
+                render={({ message }) => (
+                  <Typography variant="sm" customColor="text-red-500">
+                    {message}
+                  </Typography>
+                )}
+              />
             </div>
             {/* year */}
             <div className="flex w-full flex-col xl:w-[48%]">
@@ -282,8 +306,20 @@ export const Carform = () => {
               </Typography>
               <input
                 type="number"
-                {...register("year", { required: true })}
+                {...register("year", {
+                  required: "This is required.",
+                  valueAsNumber: true,
+                })}
                 className="block w-full rounded-lg border border-gray-300 py-2 px-4  font-JacquesM text-xs text-black focus:border-gray-400 focus:ring-gray-100 md:text-sm lg:text-md"
+              />
+              <ErrorMessage
+                errors={errors}
+                name="year"
+                render={({ message }) => (
+                  <Typography variant="sm" customColor="text-red-500">
+                    {message}
+                  </Typography>
+                )}
               />
             </div>
 
@@ -294,8 +330,17 @@ export const Carform = () => {
               </Typography>
               <input
                 type="text"
-                {...register("finance", { required: true })}
+                {...register("finance", { required: "This is required." })}
                 className="block w-full rounded-lg border border-gray-300 py-2 px-4  font-JacquesM text-xs text-black focus:border-gray-400 focus:ring-gray-100 md:text-sm lg:text-md"
+              />
+              <ErrorMessage
+                errors={errors}
+                name="finance"
+                render={({ message }) => (
+                  <Typography variant="sm" customColor="text-red-500">
+                    {message}
+                  </Typography>
+                )}
               />
             </div>
             {/* warranty */}
@@ -305,8 +350,17 @@ export const Carform = () => {
               </Typography>
               <input
                 type="text"
-                {...register("warranty", { required: true })}
+                {...register("warranty", { required: "This is required." })}
                 className="block w-full rounded-lg border border-gray-300 py-2 px-4  font-JacquesM text-xs text-black focus:border-gray-400 focus:ring-gray-100 md:text-sm lg:text-md"
+              />
+              <ErrorMessage
+                errors={errors}
+                name="warranty"
+                render={({ message }) => (
+                  <Typography variant="sm" customColor="text-red-500">
+                    {message}
+                  </Typography>
+                )}
               />
             </div>
             {/* model */}
@@ -316,8 +370,17 @@ export const Carform = () => {
               </Typography>
               <input
                 type="text"
-                {...register("model", { required: true })}
+                {...register("model", { required: "This is required." })}
                 className="block w-full rounded-lg border border-gray-300 py-2 px-4  font-JacquesM text-xs text-black focus:border-gray-400 focus:ring-gray-100 md:text-sm lg:text-md"
+              />
+              <ErrorMessage
+                errors={errors}
+                name="model"
+                render={({ message }) => (
+                  <Typography variant="sm" customColor="text-red-500">
+                    {message}
+                  </Typography>
+                )}
               />
             </div>
             {/* wheels */}
@@ -327,8 +390,17 @@ export const Carform = () => {
               </Typography>
               <input
                 type="text"
-                {...register("wheels", { required: true })}
+                {...register("wheels", { required: "This is required." })}
                 className="block w-full rounded-lg border border-gray-300 py-2 px-4  font-JacquesM text-xs text-black focus:border-gray-400 focus:ring-gray-100 md:text-sm lg:text-md"
+              />
+              <ErrorMessage
+                errors={errors}
+                name="wheels"
+                render={({ message }) => (
+                  <Typography variant="sm" customColor="text-red-500">
+                    {message}
+                  </Typography>
+                )}
               />
             </div>
             {/* color */}
@@ -338,8 +410,17 @@ export const Carform = () => {
               </Typography>
               <input
                 type="text"
-                {...register("color", { required: true })}
+                {...register("color", { required: "This is required." })}
                 className="block w-full rounded-lg border border-gray-300 py-2 px-4  font-JacquesM text-xs text-black focus:border-gray-400 focus:ring-gray-100 md:text-sm lg:text-md"
+              />
+              <ErrorMessage
+                errors={errors}
+                name="color"
+                render={({ message }) => (
+                  <Typography variant="sm" customColor="text-red-500">
+                    {message}
+                  </Typography>
+                )}
               />
             </div>
             {/* vehicleType */}
@@ -349,8 +430,17 @@ export const Carform = () => {
               </Typography>
               <input
                 type="text"
-                {...register("vehicleType", { required: true })}
+                {...register("vehicleType", { required: "This is required." })}
                 className="block w-full rounded-lg border border-gray-300 py-2 px-4  font-JacquesM text-xs text-black focus:border-gray-400 focus:ring-gray-100 md:text-sm lg:text-md"
+              />
+              <ErrorMessage
+                errors={errors}
+                name="vehicleType"
+                render={({ message }) => (
+                  <Typography variant="sm" customColor="text-red-500">
+                    {message}
+                  </Typography>
+                )}
               />
             </div>
             {/* kilometers */}
@@ -360,8 +450,17 @@ export const Carform = () => {
               </Typography>
               <input
                 type="text"
-                {...register("kilometers", { required: true })}
+                {...register("kilometers", { required: "This is required." })}
                 className="block w-full rounded-lg border border-gray-300 py-2 px-4  font-JacquesM text-xs text-black focus:border-gray-400 focus:ring-gray-100 md:text-sm lg:text-md"
+              />
+              <ErrorMessage
+                errors={errors}
+                name="kilometers"
+                render={({ message }) => (
+                  <Typography variant="sm" customColor="text-red-500">
+                    {message}
+                  </Typography>
+                )}
               />
             </div>
             {/* exportStatus */}
@@ -371,8 +470,17 @@ export const Carform = () => {
               </Typography>
               <input
                 type="text"
-                {...register("exportStatus", { required: true })}
+                {...register("exportStatus", { required: "This is required." })}
                 className="block w-full rounded-lg border border-gray-300 py-2 px-4  font-JacquesM text-xs text-black focus:border-gray-400 focus:ring-gray-100 md:text-sm lg:text-md"
+              />
+              <ErrorMessage
+                errors={errors}
+                name="exportStatus"
+                render={({ message }) => (
+                  <Typography variant="sm" customColor="text-red-500">
+                    {message}
+                  </Typography>
+                )}
               />
             </div>
             {/* specs */}
@@ -382,8 +490,17 @@ export const Carform = () => {
               </Typography>
               <input
                 type="text"
-                {...register("specs", { required: true })}
+                {...register("specs", { required: "This is required." })}
                 className="block w-full rounded-lg border border-gray-300 py-2 px-4  font-JacquesM text-xs text-black focus:border-gray-400 focus:ring-gray-100 md:text-sm lg:text-md"
+              />
+              <ErrorMessage
+                errors={errors}
+                name="specs"
+                render={({ message }) => (
+                  <Typography variant="sm" customColor="text-red-500">
+                    {message}
+                  </Typography>
+                )}
               />
             </div>
             {/* gearBox */}
@@ -393,8 +510,17 @@ export const Carform = () => {
               </Typography>
               <input
                 type="text"
-                {...register("gearBox", { required: true })}
+                {...register("gearBox", { required: "This is required." })}
                 className="block w-full rounded-lg border border-gray-300 py-2 px-4  font-JacquesM text-xs text-black focus:border-gray-400 focus:ring-gray-100 md:text-sm lg:text-md"
+              />
+              <ErrorMessage
+                errors={errors}
+                name="gearBox"
+                render={({ message }) => (
+                  <Typography variant="sm" customColor="text-red-500">
+                    {message}
+                  </Typography>
+                )}
               />
             </div>
             {/* fuel */}
@@ -404,8 +530,17 @@ export const Carform = () => {
               </Typography>
               <input
                 type="text"
-                {...register("fuel", { required: true })}
+                {...register("fuel", { required: "This is required." })}
                 className="block w-full rounded-lg border border-gray-300 py-2 px-4  font-JacquesM text-xs text-black focus:border-gray-400 focus:ring-gray-100 md:text-sm lg:text-md"
+              />
+              <ErrorMessage
+                errors={errors}
+                name="fuel"
+                render={({ message }) => (
+                  <Typography variant="sm" customColor="text-red-500">
+                    {message}
+                  </Typography>
+                )}
               />
             </div>
             {/* seat */}
@@ -415,8 +550,20 @@ export const Carform = () => {
               </Typography>
               <input
                 type="number"
-                {...register("seat", { required: true })}
+                {...register("seat", {
+                  required: "This is required.",
+                  valueAsNumber: true,
+                })}
                 className="block w-full rounded-lg border border-gray-300 py-2 px-4  font-JacquesM text-xs text-black focus:border-gray-400 focus:ring-gray-100 md:text-sm lg:text-md"
+              />
+              <ErrorMessage
+                errors={errors}
+                name="seat"
+                render={({ message }) => (
+                  <Typography variant="sm" customColor="text-red-500">
+                    {message}
+                  </Typography>
+                )}
               />
             </div>
             {/* cylinder */}
@@ -426,8 +573,20 @@ export const Carform = () => {
               </Typography>
               <input
                 type="number"
-                {...register("cylinder", { required: true })}
+                {...register("cylinder", {
+                  required: "This is required.",
+                  valueAsNumber: true,
+                })}
                 className="block w-full rounded-lg border border-gray-300 py-2 px-4  font-JacquesM text-xs text-black focus:border-gray-400 focus:ring-gray-100 md:text-sm lg:text-md"
+              />
+              <ErrorMessage
+                errors={errors}
+                name="cylinder"
+                render={({ message }) => (
+                  <Typography variant="sm" customColor="text-red-500">
+                    {message}
+                  </Typography>
+                )}
               />
             </div>
             {/* interior */}
@@ -437,8 +596,17 @@ export const Carform = () => {
               </Typography>
               <input
                 type="text"
-                {...register("interior", { required: true })}
+                {...register("interior", { required: "This is required." })}
                 className="block w-full rounded-lg border border-gray-300 py-2 px-4  font-JacquesM text-xs text-black focus:border-gray-400 focus:ring-gray-100 md:text-sm lg:text-md"
+              />
+              <ErrorMessage
+                errors={errors}
+                name="interior"
+                render={({ message }) => (
+                  <Typography variant="sm" customColor="text-red-500">
+                    {message}
+                  </Typography>
+                )}
               />
             </div>
             {/* price */}
@@ -448,8 +616,20 @@ export const Carform = () => {
               </Typography>
               <input
                 type="number"
-                {...register("price", { required: true })}
+                {...register("price", {
+                  required: "This is required.",
+                  valueAsNumber: true,
+                })}
                 className="block w-full rounded-lg border border-gray-300 py-2 px-4  font-JacquesM text-xs text-black focus:border-gray-400 focus:ring-gray-100 md:text-sm lg:text-md"
+              />
+              <ErrorMessage
+                errors={errors}
+                name="price"
+                render={({ message }) => (
+                  <Typography variant="sm" customColor="text-red-500">
+                    {message}
+                  </Typography>
+                )}
               />
             </div>
             {/* interiorDesign */}

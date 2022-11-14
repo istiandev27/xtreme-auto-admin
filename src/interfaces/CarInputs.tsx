@@ -22,4 +22,6 @@ export default interface CarInputs {
   interiorDesigns: { name: string }[];
   exteriorDesigns: { name: string }[];
   securities: { name: string }[];
+  onSale: boolean;
+  onFeatured: boolean;
 }

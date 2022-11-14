@@ -1,8 +1,11 @@
 import { Main } from "../Templates/Main";
 import { Meta } from "../layouts/Meta";
 import { AddCars } from "../src/components/common/AddCars";
+import { useHookCars } from "../hook/cars";
 
 const Home = () => {
+  const { loading } = useHookCars();
+
   return (
     <>
       <Main
@@ -13,7 +16,7 @@ const Home = () => {
           />
         }
       >
-        <AddCars />
+        {loading ? <p>loading...</p> : <AddCars />}
       </Main>
     </>
   );
