@@ -322,6 +322,17 @@ export const Carform = () => {
                 )}
               />
             </div>
+            {/* Steering side */}
+            <div className="flex w-full flex-col xl:w-[48%]">
+              <Typography variant="lg" className="font-JacquesM">
+                Steering side
+              </Typography>
+              <input
+                type="text"
+                {...register("steeringSide")}
+                className="block w-full rounded-lg border border-gray-300 py-2 px-4  font-JacquesM text-xs text-black focus:border-gray-400 focus:ring-gray-100 md:text-sm lg:text-md"
+              />
+            </div>
 
             {/* finance */}
             <div className="flex  w-full flex-col xl:w-[48%]">
@@ -449,8 +460,11 @@ export const Carform = () => {
                 Kilometers
               </Typography>
               <input
-                type="text"
-                {...register("kilometers", { required: "This is required." })}
+                type="number"
+                {...register("kilometers", {
+                  required: "This is required.",
+                  valueAsNumber: true,
+                })}
                 className="block w-full rounded-lg border border-gray-300 py-2 px-4  font-JacquesM text-xs text-black focus:border-gray-400 focus:ring-gray-100 md:text-sm lg:text-md"
               />
               <ErrorMessage
@@ -572,10 +586,9 @@ export const Carform = () => {
                 Cylinder
               </Typography>
               <input
-                type="number"
+                type="text"
                 {...register("cylinder", {
                   required: "This is required.",
-                  valueAsNumber: true,
                 })}
                 className="block w-full rounded-lg border border-gray-300 py-2 px-4  font-JacquesM text-xs text-black focus:border-gray-400 focus:ring-gray-100 md:text-sm lg:text-md"
               />

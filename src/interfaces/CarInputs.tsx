@@ -8,14 +8,14 @@ export default interface CarInputs {
   wheels: string;
   color: string;
   vehicleType: string;
-  kilometers: string;
+  kilometers: number;
   exportStatus: string;
   specs: string;
   gearBox: string;
   fuel: string;
   seat: number;
-  cylinder: number;
-  interior: number;
+  cylinder: string;
+  interior: string;
   price: number;
   imageCover: string;
   images: [];
@@ -24,4 +24,5 @@ export default interface CarInputs {
   securities: { name: string }[];
   onSale: boolean;
   onFeatured: boolean;
+  steeringSide: string;
 }
